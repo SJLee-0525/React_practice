@@ -1,6 +1,11 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 export default function Login() {
+  const [formIsInvalid, setFormIsInvalid] = useState({
+    email: false,
+    password: false,
+  })
+
   const email = useRef("")
   const password = useRef("")
 
@@ -12,8 +17,29 @@ export default function Login() {
 
     console.log(enteredEmail, enteredPassword)
 
-    email.current.value = ""
-    password.current.value = ""
+    const emailIsInvalid = !enteredEmail.includes("@")
+    if (emailIsInvalid) {
+      setFormIsInvalid((prevForm) => {
+        return { ...prevForm, email: true }
+      })
+    } else {
+      setFormIsInvalid((prevForm) => {
+        return { ...prevForm, email: false }
+      })
+    }
+
+    const passwordIsInvalid = enteredPassword.length < 8
+    if (passwordIsInvalid) {
+      setFormIsInvalid((prevForm) => {
+        return { ...prevForm, password: true }
+      })
+    } else {
+      setFormIsInvalid((prevForm) => {
+        return { ...prevForm, password: false }
+      })
+    }
+
+    event.target.reset()
   }
 
   return (
@@ -24,11 +50,13 @@ export default function Login() {
         <div className="control no-margin">
           <label htmlFor="email">Email</label>
           <input id="email" type="email" name="email" ref={email} />
+          <div className="control-error">{formIsInvalid.email && <p>Please enter a valid email address.</p>}</div>
         </div>
 
         <div className="control no-margin">
           <label htmlFor="password">Password</label>
           <input id="password" type="password" name="password" ref={password} />
+          <div className="control-error">{formIsInvalid.password && <p>Please enter a valid password.</p>}</div>
         </div>
       </div>
 

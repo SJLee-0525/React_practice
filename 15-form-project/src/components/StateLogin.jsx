@@ -1,21 +1,21 @@
-import { useState } from "react"
+import { useInput } from "../hooks/useInput.js"
+
+import Input from "./Input.jsx"
+
+import { isEmail, isNotEmpty, hasMinLength } from "../util/validation.js"
 
 export default function Login() {
-  const [enteredValue, setEnteredValue] = useState({
-    email: "",
-    password: "",
-  })
+  const { value: emailValue, handleInputChange: handleEmailChange, handleInputBlur: handleEmailBlur, hasError: emailHasError } = useInput("", (value) => isEmail(value) && isNotEmpty(value))
+  const { value: passwordValue, handleInputChange: handlePasswordChange, handleInputBlur: handlePasswordBlur, hasError: passwordHasError } = useInput("", (value) => hasMinLength(value, 8))
 
   function handleSubmit(event) {
     event.preventDefault()
 
-    console.log(enteredValue)
-  }
+    if (emailHasError || passwordHasError) {
+      return
+    }
 
-  function handleInputChange(identifier, event) {
-    setEnteredValue((prevValue) => {
-      return { ...prevValue, [identifier]: event.target.value }
-    })
+    console.log(emailValue, passwordValue)
   }
 
   return (
@@ -23,15 +23,17 @@ export default function Login() {
       <h2>Login</h2>
 
       <div className="control-row">
-        <div className="control no-margin">
-          <label htmlFor="email">Email</label>
-          <input id="email" type="email" name="email" onChange={(event) => handleInputChange("email", event)} value={enteredValue.email} />
-        </div>
-
-        <div className="control no-margin">
-          <label htmlFor="password">Password</label>
-          <input id="password" type="password" name="password" onChange={(event) => handleInputChange("password", event)} value={enteredValue.password} />
-        </div>
+        <Input label="email" id="email" type="email" name="email" error={emailHasError && "Please enter a valid email."} onBlur={handleEmailBlur} onChange={handleEmailChange} value={emailValue} />
+        <Input
+          label="password"
+          id="password"
+          type="password"
+          name="password"
+          error={passwordHasError && "Please enter a valid password."}
+          onBlur={handlePasswordBlur}
+          onChange={handlePasswordChange}
+          value={passwordValue}
+        />
       </div>
 
       <p className="form-actions">
